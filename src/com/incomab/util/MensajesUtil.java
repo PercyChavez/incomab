@@ -7,7 +7,9 @@ package com.incomab.util;
  *
  * @author peral
  */
-public class ErroresUtil {
+
+//Write all the alert messages of the app
+public class MensajesUtil {
     private final String incorrectUser="VERIFIQUE EL USUARIO INGRESADO";
     private final String incorrectPassw="VERIFIQUE LA CONTRASEÑA";
     private final String missingConnection="SE PERDIO LA CONEXION A INTERNET";

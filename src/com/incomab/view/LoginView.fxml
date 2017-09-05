@@ -4,26 +4,39 @@
 <?import com.jfoenix.controls.JFXPasswordField?>
 <?import com.jfoenix.controls.JFXSnackbar?>
 <?import com.jfoenix.controls.JFXTextField?>
+<?import com.jfoenix.controls.JFXToggleButton?>
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.effect.InnerShadow?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
 
 <AnchorPane id="AnchorPane" prefHeight="600.0" prefWidth="900.0" styleClass="mainFxmlClass" stylesheets="@../css/loginview.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.incomab.controller.impl.LoginController">
    <children>
+      <StackPane fx:id="stackpane" disable="true" prefHeight="600.0" prefWidth="900.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
       <HBox fx:id="hbxLogin" opacity="0.5" prefHeight="600.0" prefWidth="900.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
       <MaterialDesignIconView fx:id="btnClose" glyphName="CLOSE" layoutX="834.0" layoutY="41.0" onMouseClicked="#handleClose" size="30" styleClass="ScaleEffect" wrappingWidth="29.0" />
       <MaterialDesignIconView fx:id="btnMinimize" glyphName="MINUS" layoutX="790.0" layoutY="41.0" onMouseClicked="#handleMinimize" size="30" styleClass="ScaleEffect" />
       <AnchorPane fx:id="LOGINPANE" layoutX="470.0" layoutY="56.0" prefHeight="506.0" prefWidth="400.0" styleClass="LoginPane" stylesheets="@../css/loginview.css">
          <children>
-            <JFXTextField fx:id="TXTUSER" focusColor="#2c4251" labelFloat="true" layoutX="34.0" layoutY="163.0" prefHeight="29.0" prefWidth="333.0" promptText="Usuario" />
-            <JFXButton fx:id="BTNLOGIN" layoutX="34.0" layoutY="320.0" onMouseClicked="#Handle_Login" prefHeight="40.0" prefWidth="333.0" styleClass="LoginButton" text="INICIAR SESION" />
+            <JFXTextField fx:id="TXTUSER" focusColor="#2c4251" labelFloat="true" layoutX="34.0" layoutY="135.0" prefHeight="29.0" prefWidth="333.0" promptText="Usuario" />
+            <JFXButton fx:id="BTNLOGIN" layoutX="34.0" layoutY="294.0" onMouseClicked="#Handle_Login" prefHeight="40.0" prefWidth="333.0" styleClass="LoginButton" text="INGRESAR" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="15.0" />
+               </font></JFXButton>
             <Label layoutX="34.0" layoutY="344.0" prefHeight="31.0" prefWidth="333.0" textFill="RED" />
-            <Hyperlink layoutX="111.0" layoutY="408.0" text="¿Olvidaste tu contraseña?" textFill="#2c4251" />
-            <JFXPasswordField fx:id="TXTPASSWORD" focusColor="#2c4251" labelFloat="true" layoutX="34.0" layoutY="253.0" prefHeight="29.0" prefWidth="333.0" promptText="Contraseña" />
+            <Hyperlink fx:id="forgotLink" layoutX="107.0" layoutY="427.0" onMouseClicked="#loadForgetPassForm" text="¿Olvidaste tu contraseña?" textFill="#2c4251" />
+            <JFXPasswordField fx:id="TXTPASSWORD" focusColor="#2c4251" labelFloat="true" layoutX="31.0" layoutY="224.0" prefHeight="29.0" prefWidth="333.0" promptText="Contraseña" />
             <JFXSnackbar fx:id="SBMENSAJE" />
+            <JFXToggleButton fx:id="toggleRemember" layoutX="26.0" layoutY="346.0" style="-jfx-toggle-color: #2C4251;" text="Recordar Usuario" />
+            <Label layoutX="26.0" layoutY="32.0" text="INICIO DE SESIÓN">
+               <font>
+                  <Font name="System Bold" size="31.0" />
+               </font>
+            </Label>
          </children></AnchorPane>
    </children>
    <effect>

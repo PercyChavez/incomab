@@ -3,19 +3,25 @@
  */
 package com.incomab.controller.impl;
 
-import com.incomab.util.ErroresUtil;
+import com.incomab.util.EmailUtil;
+import com.incomab.util.EthernetUtil;
+import com.incomab.util.FxmlUtil;
+import com.incomab.util.MensajesUtil;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.JFXToggleButton;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -23,15 +29,23 @@ import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+import javafx.scene.control.Hyperlink;;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
+import javafx.util.Duration;import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -47,9 +61,14 @@ public class LoginController implements Initializable {
     Image imgChiclayo;
     Image imgLoro;
     Image imgMacchupicchu;
-    ErroresUtil error;
+    MensajesUtil mensa;
+    FxmlUtil fxml;
+    EmailUtil email;
+    EthernetUtil internet;
+    private final String path="/com/incomab/view/";
     private final int NUM_OF_IMGS = 4 ;
     private final int SLIDE_FREQ = 4; // in secs
+    Preferences prefs;
     @FXML
     private MaterialDesignIconView btnClose;
     @FXML
@@ -67,6 +86,12 @@ public class LoginController implements Initializable {
     private JFXTextField TXTUSER;
     @FXML
     private JFXPasswordField TXTPASSWORD;
+    @FXML
+    private Hyperlink forgotLink;
+    @FXML
+    private StackPane stackpane;
+    @FXML
+    private JFXToggleButton toggleRemember;
 
 
     /**
@@ -76,7 +101,13 @@ public class LoginController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
        LoadSlide();
        SBMENSAJE=new JFXSnackbar(LOGINPANE);
-       error=new ErroresUtil();
+       mensa=new MensajesUtil();
+       fxml=new FxmlUtil();
+       email=new EmailUtil();
+       prefs=Preferences.userNodeForPackage(getClass());   
+       TXTUSER.setText(prefs.get("user", ""));
+       TXTPASSWORD.setText(prefs.get("pass", ""));
+       toggleRemember.setSelected(prefs.getBoolean("toggle", false));
        }    
     //A LIST OF IMAGES IN A ETHERNAL LOOP TRANSITION
     private void LoadSlide(){
@@ -136,24 +167,36 @@ public class LoginController implements Initializable {
         // is stage minimizable into task bar. (true | false)
         stage.setIconified(true);
     }
-
     @FXML
-    private void Handle_Login(MouseEvent event) {
+    private void Handle_Login(MouseEvent event) {           
          Input_ok();
-         String ex="";
+         String ex="";    
          if(TXTUSER.getText().trim().equals("")){
-             ex=error.getIncorrectUser();
+             ex=mensa.getIncorrectUser();
              Show_snack(event, ex);
          }else if(TXTPASSWORD.getText().trim().equals("")){
-             ex=error.getIncorrectPassw();
+             ex=mensa.getIncorrectPassw();
              Show_snack(event, ex);
          } else{
+             Remember_me(TXTUSER.getText().trim(), TXTPASSWORD.getText().trim());
              Stage stage = (Stage) BTNLOGIN.getScene().getWindow();
-            // close login view
-            stage.close();
+             //close login view
+             stage.close();
              Load_main_window(event);
          }       
     }
+    //method used to load in preferences login user information
+    private void Remember_me(String user,String pass){
+        if(toggleRemember.isSelected()){
+           prefs.put("user", user);
+           prefs.put("pass", pass);
+           prefs.putBoolean("toggle", true);
+        }else{
+           prefs.put("user", "");
+           prefs.put("pass", "");
+           prefs.putBoolean("toggle", false);
+        }
+    }    
     //show the snackbar on screen whenever mousevent on login button 
     private void Show_snack(MouseEvent e,String m){
         SBMENSAJE.show(m, 3000);   
@@ -162,10 +205,10 @@ public class LoginController implements Initializable {
     //handle style of textfields when something went wrong
     private void Input_fail(String m){
         String stilo="-fx-text-fill: red; -jfx-focus-color: red; -jfx-unfocus-color:red";
-        if(m.equals(error.getIncorrectUser())){
+        if(m.equals(mensa.getIncorrectUser())){
         TXTUSER.setStyle(stilo);        
         }
-        if(m.equals(error.getIncorrectPassw())){
+        if(m.equals(mensa.getIncorrectPassw())){
          TXTPASSWORD.setStyle(stilo);    
         }
     }
@@ -175,16 +218,62 @@ public class LoginController implements Initializable {
         TXTUSER.setStyle(stilo);
         TXTPASSWORD.setStyle(stilo);
     }  
-    
+    //this method opens main form
     private void Load_main_window(MouseEvent event){               
-        try {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/incomab/view/MainView.fxml"));
-                Parent root1 = (Parent) fxmlLoader.load();
-                Stage stage = new Stage();
-                stage.setScene(new Scene(root1));  
-                stage.show();
-        } catch(IOException e) {
-            System.out.println(e.getMessage());
-          }
-}
+       fxml.OpenNewScene(path+"MainView.fxml",false,true);
+    }
+    //method call when user forgets password :(
+    @FXML
+    private void loadForgetPassForm(MouseEvent event) {
+        //CODE USE TO OPEN A DIALOG AND WRITE THE USERS EMAIL IN ORDER TO RECOVER THEIR DATADA
+        JFXTextField inputCorreo = new JFXTextField();
+        inputCorreo.setPromptText("email@example.com");
+        //this is necessary to make the stackpane enable, because its disable by deffect
+        stackpane.setDisable(false);
+        JFXDialogLayout content=new JFXDialogLayout();
+        content.setHeading(new Text("Ingrese su correo electronico con el que se registro:"));
+        content.setBody(inputCorreo);
+        //action buttons inside the dialog
+        JFXButton readyDialog=new JFXButton("Listo");
+        JFXButton cancelDialog=new JFXButton("Cancelar");
+        JFXDialog dialog=new JFXDialog(stackpane, content, JFXDialog.DialogTransition.CENTER);
+        //click if you want to close the dialog to recover your password
+        cancelDialog.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                dialog.close();
+                stackpane.setDisable(true);
+            }
+        });        
+        readyDialog.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                if(!inputCorreo.getText().trim().equals("")&&inputCorreo.getText().contains("@")&&inputCorreo.getText().contains(".com")){
+                    String ok="-fx-text-fill: black; -jfx-focus-color: #2c4251; -jfx-unfocus-color: #4d4d4d;";
+                    inputCorreo.setStyle(ok);
+                    Send_userdata_toemail(inputCorreo.getText().trim());
+                }else{
+                    String notok="-fx-text-fill: red; -jfx-focus-color: red; -jfx-unfocus-color:red";
+                    inputCorreo.setStyle(notok);
+                }
+            }
+        });      
+        //when dialog is closed by clicking in anywhere else but the dialog, i need to disable stackpane
+        dialog.setOnDialogClosed(disableStackPane->{
+            stackpane.setDisable(true);
+        });
+        content.setActions(readyDialog,cancelDialog);        
+        dialog.show();
+         
+    }
+    private void Send_userdata_toemail(String to){
+        //TODO: first validate if the email is one of the users' email in database
+        
+        //then send the message to recover the user information
+        //change strings by concatenating results from database
+        //first verify internet connection
+        if(internet.IsConnected()){
+            email.SendEmail(to, "contenido", "tema", "", "");
+        }
+    }
 }
